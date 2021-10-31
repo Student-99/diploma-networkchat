@@ -24,8 +24,7 @@ public class WriteMessage extends Thread {
         while (true) {
             try {
                 String messageText = scanner.nextLine();
-
-                if (messageText.equals("stop")) {
+                if (messageText.equals("/exit")) {
                     ClientMain.downService();
                     break;
                 } else {
