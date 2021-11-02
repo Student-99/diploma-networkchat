@@ -5,17 +5,21 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import intarface.Logging;
 import intarface.Message;
+import logging.MyLogging;
 import old.ServerMain;
 
 public class ServerSomthing extends Thread {
 
     private ObjectInputStream in;
     private ObjectOutputStream out;
+    private Logging logging = new MyLogging();
 
     public ServerSomthing(Socket socket) throws IOException {
-        in = new ObjectInputStream(socket.getInputStream());
         out = new ObjectOutputStream(socket.getOutputStream());
+        out.flush();
+        in = new ObjectInputStream(socket.getInputStream());
         start();
     }
 
@@ -24,7 +28,9 @@ public class ServerSomthing extends Thread {
         Message message;
         try {
             while (true) {
-                message = (Message) in.readObject();
+                Object objectIn = in.readObject();
+                message = (Message) objectIn;
+                logging.log(message);
                 for (ServerSomthing vr : ServerMain.serverList) {
 //                    if (vr.equals(this)) {
 //                        continue;
@@ -33,6 +39,7 @@ public class ServerSomthing extends Thread {
                 }
             }
         } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 

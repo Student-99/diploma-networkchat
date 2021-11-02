@@ -21,7 +21,7 @@ public class ReadMessage extends Thread {
         try {
             while (true) {
                 Message message = (Message) in.readObject();
-                logging.log(message.toString());
+                logging.log(message);
                 System.out.println(message);
             }
         } catch (IOException | ClassNotFoundException e) {

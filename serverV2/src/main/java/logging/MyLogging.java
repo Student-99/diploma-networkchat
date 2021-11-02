@@ -12,7 +12,7 @@ import message.MyMessage;
 
 public class MyLogging extends Logging {
     File folder = new File("log");
-    File logFile = new File(folder.getPath() + "/clientLog.log");
+    File logFile = new File(folder.getPath() + "/serverLog.log");
 
     @Override
     public void log(Object object) {
