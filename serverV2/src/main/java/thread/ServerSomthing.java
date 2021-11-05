@@ -25,16 +25,15 @@ public class ServerSomthing extends Thread {
 
     @Override
     public void run() {
-        Message message;
         try {
             while (true) {
                 Object objectIn = in.readObject();
-                message = (Message) objectIn;
+                Message message = (Message) objectIn;
                 logging.log(message);
                 for (ServerSomthing vr : ServerMain.serverList) {
-//                    if (vr.equals(this)) {
-//                        continue;
-//                    }
+                    if (vr.equals(this)) {
+                        continue;
+                    }
                     vr.send(message);
                 }
             }
