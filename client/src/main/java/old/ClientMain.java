@@ -22,18 +22,29 @@ public class ClientMain {
     private static String login;
 
 
-    public static void main(String[] args) throws IOException {
-        ReadFileProperties();
+    public static void main(String[] arg) throws IOException {
+        System.out.println("Начинаем чтение конфига.");
+        Map<String, String> prop = ReadFileProperties();
+        System.out.println("Прочитали конфиг.");
+
+        ip = prop.get("ADDRESS");
+        port = Integer.parseInt(prop.get("PORT"));
+        System.out.println("Получили данные ip и порта подключения.");
+
         login = pressNickname();
+        System.out.println("Установка соединения с сервером...");
         socket = new Socket(ip, port);
+        System.out.println("Соединение с сервером установлено.");
         try {
             out = new ObjectOutputStream(socket.getOutputStream());
             out.flush();
             in = new ObjectInputStream(socket.getInputStream());
-            new ReadMessage(in).start();
+            System.out.println("Чат готов к работе.");
+            new ReadMessage(in);
             new WriteMessage(out, login).start();
         } catch (IOException e) {
-            ClientMain.downService();
+            System.err.println("Произошла ошибка при работе клиентской части.");
+            downService();
         }
     }
 
@@ -45,6 +56,8 @@ public class ClientMain {
                 out.close();
             }
         } catch (IOException ignored) {
+            System.err.println("произошла ошибка при закрытии потоков подключений");
+            ignored.printStackTrace();
         }
     }
 
@@ -53,9 +66,7 @@ public class ClientMain {
         return scanner.nextLine();
     }
 
-    private static void ReadFileProperties() {
-        Map<String, String> value = ReadFileProperties.readResourcesFile("ClientProp.properties");
-        ip = value.get("ADDRESS");
-        port = Integer.parseInt(value.get("PORT"));
+    public static Map<String, String> ReadFileProperties() {
+        return ReadFileProperties.readResourcesFile("ClientProp.properties");
     }
 }

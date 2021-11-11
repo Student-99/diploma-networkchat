@@ -27,21 +27,28 @@ public class WriteMessage extends Thread {
     public void run() {
         while (true) {
             try {
-                System.out.print("Введите сообщение: ");
                 String messageText = scanner.nextLine();
                 if (messageText.equals("/exit")) {
                     ClientMain.downService();
                     break;
-                } else {
-                    Message message = new MyMessage(messageText,login,new Date());
-                    logging.log(message);
-                    out.writeObject(message);
                 }
-                out.flush();
+
+                Message message = new MyMessage(messageText, login, new Date());
+                sendMessage(message);
+                logging.log(message);
+
             } catch (IOException e) {
                 e.printStackTrace();
                 ClientMain.downService();
             }
+            if (Thread.currentThread().isInterrupted()){
+                break;
+            }
         }
+    }
+
+    public void sendMessage(Message msg) throws IOException {
+        out.writeObject(msg);
+        out.flush();
     }
 }

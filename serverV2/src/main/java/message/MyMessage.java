@@ -11,4 +11,5 @@ public class MyMessage extends Message {
         this.login = login;
         this.date = date;
     }
+
 }

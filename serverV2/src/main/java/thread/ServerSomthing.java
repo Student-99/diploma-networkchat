@@ -27,17 +27,23 @@ public class ServerSomthing extends Thread {
     public void run() {
         try {
             while (true) {
+                System.out.println("Ожидаем сообщения от клиента " + Thread.currentThread().getName());
                 Object objectIn = in.readObject();
+                System.out.println("Получили сообщение от клиента");
                 Message message = (Message) objectIn;
+                System.out.println(message.toString());
                 logging.log(message);
+                System.out.println("Начинаем отправку сообщения всем клиентам.");
                 for (ServerSomthing vr : ServerMain.serverList) {
                     if (vr.equals(this)) {
                         continue;
                     }
                     vr.send(message);
                 }
+                System.out.println("Отправка сообщений клиентам окончен");
             }
         } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Произошла ошибка в подключении с клиентом.");
             e.printStackTrace();
         }
     }
@@ -46,7 +52,9 @@ public class ServerSomthing extends Thread {
         try {
             out.writeObject(msg);
             out.flush();
-        } catch (IOException ignored) {
+        } catch (IOException exception) {
+            System.err.println("Произошла ошибка отправки сообщения клиенту.");
+            exception.printStackTrace();
         }
     }
 }

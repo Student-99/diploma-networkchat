@@ -14,6 +14,7 @@ public class ReadMessage extends Thread {
 
     public ReadMessage(ObjectInputStream in) {
         this.in = in;
+        start();
     }
 
     @Override
@@ -28,4 +29,5 @@ public class ReadMessage extends Thread {
             ClientMain.downService();
         }
     }
+
 }
