@@ -12,6 +12,7 @@ import message.MyMessage;
 import old.ClientMain;
 
 public class WriteMessage extends Thread {
+
     private ObjectOutputStream out;
     private Logging logging = new MyLogging();
 
@@ -32,10 +33,9 @@ public class WriteMessage extends Thread {
                     ClientMain.downService();
                     break;
                 }
-
                 Message message = new MyMessage(messageText, login, new Date());
-                sendMessage(message);
                 logging.log(message);
+                sendMessage(message);
 
             } catch (IOException e) {
                 e.printStackTrace();

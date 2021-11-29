@@ -10,7 +10,7 @@ import thread.ServerSomthing;
 import workInFile.ReadFileProperties;
 
 public class ServerMain {
-    public static int port;
+    private static int port;
     public static LinkedList<ServerSomthing> serverList = new LinkedList<>();
 
     public static void main(String[] args) throws IOException {
@@ -24,9 +24,11 @@ public class ServerMain {
             while (true) {
                 System.out.println("Ожидаем подключения к серверу.");
                 Socket socket = serverSocket.accept();
-                System.out.println("Произошло подключение е серверу");
+                System.out.println("Произошло подключение к серверу");
                 try {
-                    serverList.add(new ServerSomthing(socket));
+                    ServerSomthing serverSomthing = new ServerSomthing(socket);
+                    serverList.add(serverSomthing);
+                    serverSomthing.start();
                 } catch (IOException e) {
                     socket.close();
                 }

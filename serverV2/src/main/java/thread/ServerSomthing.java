@@ -20,7 +20,6 @@ public class ServerSomthing extends Thread {
         out = new ObjectOutputStream(socket.getOutputStream());
         out.flush();
         in = new ObjectInputStream(socket.getInputStream());
-        start();
     }
 
     @Override
@@ -34,17 +33,24 @@ public class ServerSomthing extends Thread {
                 System.out.println(message.toString());
                 logging.log(message);
                 System.out.println("Начинаем отправку сообщения всем клиентам.");
-                for (ServerSomthing vr : ServerMain.serverList) {
-                    if (vr.equals(this)) {
-                        continue;
-                    }
-                    vr.send(message);
-                }
+                sendMessageAllClients(message);
                 System.out.println("Отправка сообщений клиентам окончен");
+                if (Thread.currentThread().isInterrupted()) {
+                   break;
+                }
             }
         } catch (IOException | ClassNotFoundException e) {
             System.err.println("Произошла ошибка в подключении с клиентом.");
             e.printStackTrace();
+        }
+    }
+
+    public void sendMessageAllClients(Message message) {
+        for (ServerSomthing vr : ServerMain.serverList) {
+            if (vr.equals(this)) {
+                continue;
+            }
+            vr.send(message);
         }
     }
 

@@ -21,8 +21,6 @@ import static old.ClientMain.ReadFileProperties;
 public class ClientTests {
     private static String ip;
     private static int port;
-    private static ObjectOutputStream objectOutputStreamMock = Mockito.mock(ObjectOutputStream.class);
-    private WriteMessage writeMessageMock = Mockito.mock(WriteMessage.class);
 
     @BeforeAll
     static void beforeAll() {
@@ -32,13 +30,13 @@ public class ClientTests {
     }
 
     @Test
-    void CheckSentMessage() throws IOException, InterruptedException {
+    void checkSentMessage() throws IOException, InterruptedException {
         //отправляемое сообщение
         String msg = "Hi. My Name is Denis";
         //Логин пользователя
         String login = "My login";
 
-        Message expectedMessage = new MyMessage(msg,login,new Date());
+        Message expectedMessage = new MyMessage(msg, login, new Date());
 
         //эмулирование ввода данных с клавиатуры
         InputStream inputStream = new ByteArrayInputStream(msg.getBytes());
@@ -52,8 +50,8 @@ public class ClientTests {
                 e.printStackTrace();
             }
         }).start();
-        //даю время на поднятие
-        Thread.sleep(3_000);
+        //даю время на поднятие сервера
+        Thread.sleep(500);
 
         //создаю соединение клиента с сервером
         Socket socket = new Socket(ip, port);
@@ -63,25 +61,26 @@ public class ClientTests {
 
         //Создаю поток для отправки сообщения на сервер
         Thread write = new WriteMessage(out, login);
+
+        WriteMessage mockThread = (WriteMessage) Mockito.spy(write);
         //останавливаю поток чтоб он отработал только одну итерацию
-        write.interrupt();
-        write.start();
-        //ожидание на то чтоб поток с отправкой сообщения отработал
-        Thread.sleep(2_000);
+        mockThread.interrupt();
+        mockThread.start();
+        mockThread.join();
 
         //получаю данные которые были отправлены на сервер
         var captor = ArgumentCaptor.forClass(Message.class);
-        Mockito.verify(writeMessageMock,Mockito.times(1)).sendMessage(Mockito.any());
+        Mockito.verify(mockThread, Mockito.times(1)).sendMessage(captor.capture());
         var message = captor.getValue();
 
-        Assertions.assertTrue(assertEqualsMessage(expectedMessage,message));
+        Assertions.assertTrue(assertEqualsMessage(expectedMessage, message));
     }
 
-    boolean assertEqualsMessage(Message expectedMessage, Message actualMessage){
-        if (!expectedMessage.getMessageText().equals(actualMessage.getMessageText())){
+    boolean assertEqualsMessage(Message expectedMessage, Message actualMessage) {
+        if (!expectedMessage.getMessageText().equals(actualMessage.getMessageText())) {
             return false;
         }
-        if (!expectedMessage.getLogin().equals(actualMessage.getLogin())){
+        if (!expectedMessage.getLogin().equals(actualMessage.getLogin())) {
             return false;
         }
         return true;
